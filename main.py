@@ -17,7 +17,6 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 # Constants
 ROBLOX_API_BASE = "https://users.roblox.com/v1"
-ROBLOX_SEARCH_API = "https://www.roblox.com/api/users/search/results"
 ROBLOX_HEADSHOT_API = "https://www.roblox.com/headshot-thumbnail/image"
 
 class RobloxSearchCog(commands.Cog):
@@ -52,16 +51,16 @@ class RobloxSearchCog(commands.Cog):
                 await interaction.followup.send(embed=embed)
                 return
 
-            # Search for the user
+            # Search for the user using the new API endpoint
             search_response = requests.get(
-                ROBLOX_SEARCH_API,
+                f"{ROBLOX_API_BASE}/users/search",
                 params={"keyword": username, "limit": 1},
                 timeout=5
             )
             search_response.raise_for_status()
             search_data = search_response.json()
 
-            if not search_data.get("UserSearchResults") or len(search_data["UserSearchResults"]) == 0:
+            if not search_data.get("data") or len(search_data["data"]) == 0:
                 embed = discord.Embed(
                     title="❌ User Not Found",
                     description=f"No Roblox user found with username: `{username}`",
@@ -70,8 +69,8 @@ class RobloxSearchCog(commands.Cog):
                 await interaction.followup.send(embed=embed)
                 return
 
-            user_search = search_data["UserSearchResults"][0]
-            user_id = user_search["UserId"]
+            user_search = search_data["data"][0]
+            user_id = user_search["id"]
 
             # Get detailed user information
             user_response = requests.get(
