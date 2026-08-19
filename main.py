@@ -5,8 +5,11 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
+
+# Get token from environment
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 # Bot setup
 intents = discord.Intents.default()
@@ -91,9 +94,11 @@ async def rsearch(interaction: discord.Interaction, username: str):
     except Exception as e:
         await interaction.followup.send(f"❌ Error: {str(e)}")
 
-# Start bot
-token = os.getenv("DISCORD_TOKEN")
-if not token:
-    print("❌ DISCORD_TOKEN not found in .env file!")
-else:
-    bot.run(token)
+# Start bot with error checking
+if __name__ == "__main__":
+    if not DISCORD_TOKEN:
+        print("❌ ERROR: DISCORD_TOKEN not found!")
+        print("Make sure your .env file contains: DISCORD_TOKEN=your_token_here")
+    else:
+        print("✅ Token loaded successfully!")
+        bot.run(DISCORD_TOKEN)
